@@ -1,4 +1,5 @@
 import pygame
+import random
 from abc import ABC, abstractmethod
 from queue import PriorityQueue
 
@@ -63,6 +64,20 @@ class Enemy(Entity):
 			(-1, 0),
 			(1, 0),
 		]
+	
+	def get_valid_moves(self, pos=None) -> list[tuple[int, int]]:
+		if not pos:
+			pos = self.pos
+		moves = []
+		x, y = pos
+		for (dx, dy) in self.DIRS:
+			x_, y_ = x + dx, y + dy
+			if x_ < 0 or x_ >= len(self.level[0]) or y_ < 0 or y_ >= len(self.level):
+				continue
+			if self.level[y_][x_] == '#':
+				continue
+			moves.append((dx, dy))
+		return moves
 
 	def find_path(self, end : tuple[int, int]) -> list:
 		f = [[float('inf') for _ in self.level[0]] for _ in self.level]
@@ -75,13 +90,9 @@ class Enemy(Entity):
 			if pos == end:
 				return path
 			x, y = pos
-			for dir in self.DIRS:
-				dx, dy = dir
+			for (dx, dy) in self.get_valid_moves((x, y)):
 				x_, y_ = x + dx, y + dy
-				if x_ < 0 or x_ >= len(self.level[0]) or y_ < 0 or y_ >= len(self.level):
-					continue
-				if self.level[y_][x_] == '#':
-					continue
+				print(x_, y_)
 				h = ((x - x_) ** 2 + (y - y_) ** 2) ** .5
 				f_ = g + h
 				if f_ < f[y_][x_]:
@@ -89,7 +100,7 @@ class Enemy(Entity):
 					queue.put((f_, (g + 1, path + [(x_, y_)])))
 		return []
 
-	def minimax(alpha : int, beta : int) -> tuple[int, int]:
+	def alpha_beta(self, agent, depth, alpha=float('inf'), beta=float('inf'), maximizing=True) -> tuple[int, int]:
 		pass
 
 	def update(self, target : tuple[int, int]):

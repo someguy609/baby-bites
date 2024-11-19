@@ -11,6 +11,11 @@ def start_level(level: list[str], tile_size=50) -> bool:
     walls = []
     finish = None
 
+    # wall = 
+
+    floor = pygame.image.load('assets/floor.png')
+    floor = pygame.transform.scale(floor, (tile_size, tile_size))
+
     for i in range(len(level)):
         for j in range(len(level[i])):
             match level[i][j]:
@@ -28,6 +33,9 @@ def start_level(level: list[str], tile_size=50) -> bool:
 
     while playing:
         screen.fill((255, 255, 255))
+        for i in range(height):
+            for j in range(width):
+                screen.blit(floor, (j * tile_size, i * tile_size))
         for event in pygame.event.get():
             match event.type:
                 case pygame.QUIT:
