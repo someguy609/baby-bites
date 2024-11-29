@@ -14,9 +14,9 @@ class Entity(ABC, pygame.sprite.Sprite):
 		self.level = level
 		self.tile_size = tile_size
 
-	def draw(self, surface : pygame.Surface):
-		self.rect.x = self.x * self.tile_size
-		self.rect.y = self.y * self.tile_size
+	def draw(self, surface : pygame.Surface, x_offset, y_offset):
+		self.rect.x = self.x * self.tile_size + x_offset
+		self.rect.y = self.y * self.tile_size + y_offset
 		surface.blit(self.image, self.rect)
 
 	@abstractmethod
@@ -110,9 +110,9 @@ class Enemy(Entity):
 
 class Wall(pygame.sprite.Sprite):
 
-	def __init__(self, pos : tuple[int, int], tile_size : int):
+	def __init__(self, pos : tuple[int, int], tile_size : int, x_offset, y_offset):
 		super().__init__()
-		self.rect = pygame.rect.Rect(pos[0] * tile_size, pos[1] * tile_size, tile_size, tile_size)
+		self.rect = pygame.rect.Rect(pos[0] * tile_size + x_offset, pos[1] * tile_size + y_offset, tile_size, tile_size)
 	
 	def draw(self, surface : pygame.Surface):
 		pygame.draw.rect(surface, (255, 0, 0), self.rect)
