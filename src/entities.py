@@ -1,3 +1,4 @@
+
 import pygame
 import random
 from abc import ABC, abstractmethod
@@ -22,6 +23,16 @@ class Entity(ABC, pygame.sprite.Sprite):
 	@abstractmethod
 	def update(self):
 		pass
+
+	@property
+	def pos(self):
+		return (self.x, self.y)
+
+	@pos.setter
+	def pos(self, new_pos : list[int, int]):
+		x, y = new_pos
+		assert x >= 0 and x < len(self.level[0]) and y >= 0 and y < len(self.level), 'Invalid new position'
+		self.x, self.y = new_pos
 
 class Player(Entity):
 
@@ -65,21 +76,21 @@ class Enemy(Entity):
 			(1, 0),
 		]
 	
-	def get_valid_moves(self, pos=None) -> list[tuple[int, int]]:
+	def get_valid_positions(self, pos=None) -> list[tuple[int, int]]:
 		if not pos:
 			pos = self.pos
 		moves = []
 		x, y = pos
-		for (dx, dy) in self.DIRS:
+		for dx, dy in self.DIRS:
 			x_, y_ = x + dx, y + dy
 			if x_ < 0 or x_ >= len(self.level[0]) or y_ < 0 or y_ >= len(self.level):
 				continue
 			if self.level[y_][x_] == '#':
 				continue
-			moves.append((dx, dy))
+			moves.append((x + dx, y + dy))
 		return moves
 
-	def find_path(self, end : tuple[int, int]) -> list:
+	def a_star(self, end : tuple[int, int]) -> list:
 		f = [[float('inf') for _ in self.level[0]] for _ in self.level]
 		start = (self.x, self.y)
 		queue = PriorityQueue()
@@ -90,9 +101,7 @@ class Enemy(Entity):
 			if pos == end:
 				return path
 			x, y = pos
-			for (dx, dy) in self.get_valid_moves((x, y)):
-				x_, y_ = x + dx, y + dy
-				print(x_, y_)
+			for x_, y_ in self.get_valid_positions(pos):
 				h = ((x - x_) ** 2 + (y - y_) ** 2) ** .5
 				f_ = g + h
 				if f_ < f[y_][x_]:
@@ -100,13 +109,47 @@ class Enemy(Entity):
 					queue.put((f_, (g + 1, path + [(x_, y_)])))
 		return []
 
-	def alpha_beta(self, agent, depth, alpha=float('inf'), beta=float('inf'), maximizing=True) -> tuple[int, int]:
-		pass
+	def alpha_beta(self, pos, target, depth, alpha=-float('inf'), beta=float('inf'), maximizing=True):
+		def heuristic(p1, p2):
+			return -((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
 
-	def update(self, target : tuple[int, int]):
-		best_path = self.find_path(target)
-		assert best_path is not None
-		self.x, self.y = best_path[1]
+		if depth == 0 or self.get_valid_positions(pos) == 0:
+			return heuristic(pos, target), pos
+
+		if maximizing:
+			max_eval = -float('inf')
+			best_move = pos
+			for move in self.get_valid_positions(pos):
+				eval, _ = self.alpha_beta(move, target, depth - 1, alpha, beta, False)
+				if eval > max_eval:
+					max_eval = eval
+					best_move = move
+				alpha = max(alpha, eval)
+				if beta <= alpha: 
+					break
+			return max_eval, best_move
+		else:
+			min_eval = float('inf')
+			best_move = pos
+			for move in self.get_valid_positions(pos):
+				eval, _ = self.alpha_beta(move, target, depth - 1, alpha, beta, True)
+				if eval < min_eval:
+					min_eval = eval
+					best_move = move
+				beta = min(beta, eval)
+				if beta <= alpha: 
+					break
+			return min_eval, best_move
+
+	def update(self, target: tuple[int, int], algo):
+		if algo == 'alpha_beta':
+			_, best_move = self.alpha_beta(self.pos, target, depth=3)
+			if best_move:
+				self.pos = best_move
+		elif algo == 'a_star':
+			best_path = self.a_star(target) 
+			assert best_path is not None
+			self.x, self.y = best_path[1]
 
 class Wall(pygame.sprite.Sprite):
 

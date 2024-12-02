@@ -54,7 +54,7 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
             break
         if player.moved:
             for enemy in enemies:
-                enemy.update((player.x, player.y))
+                enemy.update((player.x, player.y),algo='a_star')
             player.moved = False
         for enemy in enemies:
             if (player.x, player.y) == (enemy.x, enemy.y):
