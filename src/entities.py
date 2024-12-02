@@ -37,8 +37,14 @@ class Entity(ABC, pygame.sprite.Sprite):
 class Player(Entity):
 
 	def __init__(self, level : list[list[str]], pos : tuple[int, int], tile_size : int):
-		super().__init__(level, pos, 'assets/baby.png', tile_size)
+		super().__init__(level, pos, 'assets/baby/right.png', tile_size)
 		self.moved = False
+		self.rightImage = self.image
+		self.leftImage = pygame.image.load('assets/baby/left.png')
+		self.downImage = pygame.image.load('assets/baby/down.png')
+  
+		self.leftImage = pygame.transform.scale(self.leftImage, (tile_size, tile_size))
+		self.downImage = pygame.transform.scale(self.downImage, (tile_size, tile_size))
 	
 	def update(self):
 		if self.moved:
@@ -46,11 +52,13 @@ class Player(Entity):
 		keys = pygame.key.get_pressed()
 		if self.x > 0:
 			if keys[pygame.K_LEFT]:
+				self.image = self.leftImage
 				if self.level[self.y][self.x - 1] != '#':
 					self.x -= 1
 					self.moved = True
 		if self.x < len(self.level[0]) - 1:
 			if keys[pygame.K_RIGHT]:
+				self.image = self.rightImage
 				if self.level[self.y][self.x + 1] != '#':
 					self.x += 1
 					self.moved = True
@@ -61,6 +69,7 @@ class Player(Entity):
 					self.moved = True
 		if self.y < len(self.level) - 1:
 			if keys[pygame.K_DOWN]:
+				self.image = self.downImage
 				if self.level[self.y + 1][self.x] != '#':
 					self.y += 1
 					self.moved = True
@@ -68,13 +77,17 @@ class Player(Entity):
 class Enemy(Entity):
 
 	def __init__(self, level : list[list[str]], pos : tuple[int, int], tile_size : int):
-		super().__init__(level, pos, 'assets/virus.png', tile_size)
+		super().__init__(level, pos, 'assets/virus/virus1.png', tile_size)
 		self.DIRS = [
 			(0, -1),
 			(0, 1),
 			(-1, 0),
 			(1, 0),
 		]
+		self.frame = [self.image, pygame.image.load('assets/virus/virus2.png')]
+		self.frame[1] = pygame.transform.scale(self.frame[1], (tile_size, tile_size))
+	
+		self.frameCounter = 0
 	
 	def get_valid_positions(self, pos=None) -> list[tuple[int, int]]:
 		if not pos:
@@ -91,6 +104,10 @@ class Enemy(Entity):
 		return moves
 
 	def a_star(self, end : tuple[int, int]) -> list:
+		self.image = self.frame[self.frameCounter % 2]
+  
+		self.frameCounter += 1
+  
 		f = [[float('inf') for _ in self.level[0]] for _ in self.level]
 		start = (self.x, self.y)
 		queue = PriorityQueue()

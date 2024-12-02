@@ -40,7 +40,7 @@ def show_menu(screen):
 
 pygame.init()
 tile_size = 100
-screen = pygame.display.set_mode((1000, 800))
+screen = pygame.display.set_mode((1300, 950))
 
 
 show_menu(screen)
@@ -70,6 +70,13 @@ levels = [
         '#.###.#..#',
         '#...#...##',
         '##########',
+    ],
+    [
+        'E........',
+        '.###S###.',
+        'E........',
+        'F###.###.',
+        'E........',
     ],
 ]
 
