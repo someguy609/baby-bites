@@ -46,14 +46,14 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
         for event in pygame.event.get():
             match event.type:
                 case pygame.QUIT:
-                    return False, float('inf')
+                    return 'quit', None
             player.update()
         player.draw(screen, x_offset, y_offset)
         if (player.x, player.y) == finish:
             break
         for enemy in enemies:
             if (player.x, player.y) == (enemy.x, enemy.y):
-                return False, float('inf')
+                return 'reset', None
             if player.moved:
                 enemy.update((player.x, player.y),algo='a_star')
             enemy.draw(screen, x_offset, y_offset)
@@ -65,4 +65,4 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
         pygame.display.flip()
         pygame.display.update()
     
-    return True, player.moves
+    return 'completed', player.moves

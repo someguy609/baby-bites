@@ -111,20 +111,38 @@ levels = [
     ],
 ]
 
-replay = True
+while True:
 
-while replay:
+    state = None
+
     for level in levels:
-        completed = False
-        while not completed:
-            completed, moves = start_level(level, screen, tile_size)
-            if completed:
+
+        if state == 'quit':
+            break
+
+        state = 'reset'
+
+        while state == 'reset':
+            state, moves = start_level(level, screen, tile_size)
+        
+        match state:
+            case 'completed':
                 player_moves += moves
+            case 'quit':
+                break
+            # if completed:
+            #     player_moves += moves
                 # print("Player moves: {player_moves} Moves: {moves}")
+    
+    if state == 'quit':
+        break
 
     high_score = min(high_score, player_moves)
         
     replay = show_finished_screen(screen, high_score)
+
+    if not replay:
+        break
 
 
 pygame.quit()
