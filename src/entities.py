@@ -39,12 +39,16 @@ class Player(Entity):
 	def __init__(self, level : list[list[str]], pos : tuple[int, int], tile_size : int):
 		super().__init__(level, pos, 'assets/baby/right.png', tile_size)
 		self.moved = False
+		self.moves = 0
+  
 		self.rightImage = self.image
 		self.leftImage = pygame.image.load('assets/baby/left.png')
 		self.downImage = pygame.image.load('assets/baby/down.png')
+		self.upImage = pygame.image.load('assets/baby/up.png')
   
 		self.leftImage = pygame.transform.scale(self.leftImage, (tile_size, tile_size))
 		self.downImage = pygame.transform.scale(self.downImage, (tile_size, tile_size))
+		self.upImage = pygame.transform.scale(self.upImage, (tile_size, tile_size))
 	
 	def update(self):
 		if self.moved:
@@ -56,23 +60,31 @@ class Player(Entity):
 				if self.level[self.y][self.x - 1] != '#':
 					self.x -= 1
 					self.moved = True
+					self.moves += 1
+     
 		if self.x < len(self.level[0]) - 1:
 			if keys[pygame.K_RIGHT]:
 				self.image = self.rightImage
 				if self.level[self.y][self.x + 1] != '#':
 					self.x += 1
 					self.moved = True
+					self.moves += 1
+     
 		if self.y > 0:
 			if keys[pygame.K_UP]:
+				self.image = self.upImage
 				if self.level[self.y - 1][self.x] != '#':
 					self.y -= 1
 					self.moved = True
+					self.moves += 1
+     
 		if self.y < len(self.level) - 1:
 			if keys[pygame.K_DOWN]:
 				self.image = self.downImage
 				if self.level[self.y + 1][self.x] != '#':
 					self.y += 1
 					self.moved = True
+					self.moves += 1
 
 class Enemy(Entity):
 
