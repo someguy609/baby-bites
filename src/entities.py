@@ -161,8 +161,8 @@ class Enemy(Entity):
 	def update(self, target: tuple[int, int], algo):
 		if algo == 'alpha_beta':
 			_, best_move = self.alpha_beta(self.pos, target, depth=3)
-			if best_move:
-				self.pos = best_move
+			assert best_move is not None
+			self.pos = best_move
 		elif algo == 'a_star':
 			best_path = self.a_star(target) 
 			assert best_path is not None

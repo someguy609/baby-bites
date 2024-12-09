@@ -10,9 +10,6 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
     
     x_offset = (screen_width - width*tile_size) // 2
     y_offset = (screen_height - height*tile_size) // 2
-    
-    print(x_offset)
-    print(width)
 
     player = None
     enemies = []
@@ -52,14 +49,13 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
         player.draw(screen, x_offset, y_offset)
         if (player.x, player.y) == finish:
             break
-        if player.moved:
-            for enemy in enemies:
-                enemy.update((player.x, player.y),algo='a_star')
-            player.moved = False
         for enemy in enemies:
             if (player.x, player.y) == (enemy.x, enemy.y):
-                break
+                return False
+            if player.moved:
+                enemy.update((player.x, player.y),algo='a_star')
             enemy.draw(screen, x_offset, y_offset)
+        player.moved = False
         for wall in walls:
             wall.draw(screen)
         pygame.display.flip()
