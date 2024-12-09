@@ -51,6 +51,7 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
         player.draw(screen, x_offset, y_offset)
         if (player.x, player.y) == finish:
             break
+        Enemy.traffic = [[0 for _ in level[0]] for _ in level]
         for enemy in enemies:
             if (player.x, player.y) == (enemy.x, enemy.y):
                 return 'reset', None

@@ -88,7 +88,9 @@ class Player(Entity):
 
 class Enemy(Entity):
 
-	def __init__(self, level : list[list[str]], pos : tuple[int, int], tile_size : int):
+	traffic : list[list[int]] = None
+
+	def __init__(self, level : list[list[str]], pos : tuple[int, int], tile_size : int, traffic_factor=1):
 		super().__init__(level, pos, 'assets/virus/virus1.png', tile_size)
 		self.DIRS = [
 			(0, -1),
@@ -100,6 +102,7 @@ class Enemy(Entity):
 		self.frame[1] = pygame.transform.scale(self.frame[1], (tile_size, tile_size))
 	
 		self.frameCounter = 0
+		self.traffic_factor = traffic_factor
 	
 	def get_valid_positions(self, pos=None) -> list[tuple[int, int]]:
 		if not pos:
@@ -114,6 +117,11 @@ class Enemy(Entity):
 				continue
 			moves.append((x + dx, y + dy))
 		return moves
+	
+	def heuristic(self, start : tuple[int, int], end : tuple[int, int]):
+		x1, y1 = start
+		x2, y2 = end
+		return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** .5 + Enemy.traffic[y2][x2]
 
 	def a_star(self, end : tuple[int, int]) -> list:
 		self.image = self.frame[self.frameCounter % 2]
@@ -128,14 +136,16 @@ class Enemy(Entity):
 			_, [g, path] = queue.get()
 			pos = path[-1]
 			if pos == end:
+				for x, y in path[:-1]:
+					Enemy.traffic[y][x] += self.traffic_factor
 				return path
-			x, y = pos
-			for x_, y_ in self.get_valid_positions(pos):
-				h = ((x - x_) ** 2 + (y - y_) ** 2) ** .5
+			for next_pos in self.get_valid_positions(pos):
+				x_, y_ = next_pos
+				h = self.heuristic(pos, next_pos)
 				f_ = g + h
 				if f_ < f[y_][x_]:
 					f[y_][x_] = f_
-					queue.put((f_, (g + 1, path + [(x_, y_)])))
+					queue.put((f_, (g + 1, path + [next_pos])))
 		return []
 
 	def alpha_beta(self, pos, target, depth, alpha=-float('inf'), beta=float('inf'), maximizing=True):
