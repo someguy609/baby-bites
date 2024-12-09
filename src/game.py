@@ -1,5 +1,5 @@
 import pygame
-from .entities import Player, Enemy, Wall
+from .entities import Player, Enemy, Wall, Food
 
 def start_level(level: list[str], screen, tile_size=50) -> bool:
 
@@ -15,6 +15,7 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
     enemies = []
     walls = []
     finish = None
+    food = None
 
     # wall = 
 
@@ -31,6 +32,7 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
                 case '#':
                     walls.append(Wall((j, i), tile_size, x_offset, y_offset))
                 case 'F':
+                    food = Food((j, i), tile_size, x_offset, y_offset)
                     finish = (j, i)
 
     # screen = pygame.display.set_mode((width * tile_size, height * tile_size))
@@ -58,6 +60,8 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
         player.moved = False
         for wall in walls:
             wall.draw(screen)
+        if food:
+            food.draw(screen)
         pygame.display.flip()
         pygame.display.update()
     

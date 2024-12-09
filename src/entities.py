@@ -169,10 +169,23 @@ class Enemy(Entity):
 			self.x, self.y = best_path[1]
 
 class Wall(pygame.sprite.Sprite):
+    def __init__(self, pos: tuple[int, int], tile_size: int, x_offset, y_offset):
+        super().__init__()
+        self.image = pygame.image.load('assets/wall.png')
+        self.image = pygame.transform.scale(self.image, (tile_size, tile_size))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (pos[0] * tile_size + x_offset, pos[1] * tile_size + y_offset)
+    
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, self.rect)
 
-	def __init__(self, pos : tuple[int, int], tile_size : int, x_offset, y_offset):
-		super().__init__()
-		self.rect = pygame.rect.Rect(pos[0] * tile_size + x_offset, pos[1] * tile_size + y_offset, tile_size, tile_size)
-	
-	def draw(self, surface : pygame.Surface):
-		pygame.draw.rect(surface, (255, 0, 0), self.rect)
+class Food(pygame.sprite.Sprite):
+    def __init__(self, pos: tuple[int, int], tile_size: int, x_offset: int, y_offset: int):
+        super().__init__()
+        self.image = pygame.image.load('assets/food.png')
+        self.image = pygame.transform.scale(self.image, (tile_size, tile_size))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (pos[0] * tile_size + x_offset, pos[1] * tile_size + y_offset)
+    
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, self.rect)

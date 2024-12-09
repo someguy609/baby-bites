@@ -37,7 +37,6 @@ def show_menu(screen):
         
         pygame.display.flip()
 
-
 pygame.init()
 tile_size = 100
 screen = pygame.display.set_mode((1300, 950))
