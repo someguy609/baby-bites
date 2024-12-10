@@ -90,7 +90,7 @@ class Enemy(Entity):
 
 	traffic : list[list[int]] = None
 
-	def __init__(self, level : list[list[str]], pos : tuple[int, int], tile_size : int, traffic_factor=1):
+	def __init__(self, level : list[list[str]], pos : tuple[int, int], tile_size : int, traffic_factor : int):
 		super().__init__(level, pos, 'assets/virus/virus1.png', tile_size)
 		self.DIRS = [
 			(0, -1),
@@ -149,11 +149,9 @@ class Enemy(Entity):
 		return []
 
 	def alpha_beta(self, pos, target, depth, alpha=-float('inf'), beta=float('inf'), maximizing=True):
-		def heuristic(p1, p2):
-			return -((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
 
 		if depth == 0 or self.get_valid_positions(pos) == 0:
-			return heuristic(pos, target), pos
+			return -self.heuristic(pos, target), pos
 
 		if maximizing:
 			max_eval = -float('inf')
@@ -182,7 +180,7 @@ class Enemy(Entity):
 
 	def update(self, target: tuple[int, int], algo):
 		if algo == 'alpha_beta':
-			_, best_move = self.alpha_beta(self.pos, target, depth=3)
+			_, best_move = self.alpha_beta(self.pos, target, depth=4)
 			assert best_move is not None
 			self.pos = best_move
 		elif algo == 'a_star':

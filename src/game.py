@@ -1,3 +1,4 @@
+import random
 import pygame
 from .entities import Player, Enemy, Wall, Food
 
@@ -28,7 +29,7 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
                 case 'S':
                     player = Player(level, (j, i), tile_size)
                 case 'E':
-                    enemies.append(Enemy(level, (j, i), tile_size))
+                    enemies.append(Enemy(level, (j, i), tile_size, 2))
                 case '#':
                     walls.append(Wall((j, i), tile_size, x_offset, y_offset))
                 case 'F':
@@ -56,7 +57,7 @@ def start_level(level: list[str], screen, tile_size=50) -> bool:
             if (player.x, player.y) == (enemy.x, enemy.y):
                 return 'reset', None
             if player.moved:
-                enemy.update((player.x, player.y),algo='a_star')
+                enemy.update((player.x, player.y),algo=random.sample(['a_star', 'alpha_beta'], 1)[0])
             enemy.draw(screen, x_offset, y_offset)
         player.moved = False
         for wall in walls:
